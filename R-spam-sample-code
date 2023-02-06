@@ -1,0 +1,32 @@
+# Lalith Suresh
+# 11-12-2022
+# Program analyzes how many spam emails
+# contain the word "credit" or "meeting"
+# and the probabilities of their 
+# nature of being spam. 
+
+# The program analyzes ways to find
+# a common ground as to when
+# emails with the word "credit" or
+# "meeting" need to be considered spam 
+
+
+setwd("~/Desktop")
+data <- read.csv("spam.csv")
+meeting <- data[,"meeting"]
+credit <- data[,"credit"]
+spam <- data[,"spam"]
+boxplot(meeting ~ spam)
+boxplot(credit ~ spam)
+lm(spam ~ credit + meeting+credit + meeting:credit, family = binomial)
+fit2 <- glm(spam ~ credit+meeting, family = binomial)
+summary(fit2)
+new <- as.data.frame(t(c(.2, 0)))
+colnames(new) <- c("credit", "meeting")
+predlogodds <- predict(fit2, newdata=new)
+1 / (1 + exp(-predlogodds)) 
+predlogodds <- predict(fit2)
+predprobs <- 1 / (1 + exp(-predlogodds))
+predspam <- predprobs >= .5
+tab1 <- table(predspam, spam)
+tab1
